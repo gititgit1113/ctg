@@ -10,22 +10,14 @@
 body {
     margin: 0;
     height: 100vh;
+    background: black;
     overflow: hidden;
     font-family: Arial, sans-serif;
     color: white;
-    background: linear-gradient(135deg, #0ff, #ff00ff, #ffcc00, #00ff88);
-    background-size: 400% 400%;
-    animation: bgmove 18s ease infinite;
     display: flex;
     justify-content: center;
     align-items: center;
     user-select: none;
-}
-
-@keyframes bgmove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
 }
 
 /* INTRO */
@@ -34,23 +26,18 @@ body {
     position: fixed;
     inset: 0;
     background: black;
-    z-index: 20;
+    z-index: 50;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
 }
 
-#overlayText {
-    font-size: 1.5em;
-    opacity: 1;
-}
-
 #intro {
     position: fixed;
     inset: 0;
+    z-index: 40;
     pointer-events: none;
-    z-index: 15;
 }
 
 .orb {
@@ -58,38 +45,23 @@ body {
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    background: rgba(0, 150, 255, 0.6);
-    filter: blur(30px);
-    animation: float 2s ease-in-out infinite alternate;
+    background: rgba(0, 140, 255, 0.7);
+    filter: blur(35px);
+    transition: all 3s ease;
 }
 
-@keyframes float {
-    from { transform: translateY(-20px); }
-    to { transform: translateY(20px); }
+.spinGroup {
+    animation: spin 2s linear infinite;
 }
 
-.merge {
-    animation: merge 3s ease-in-out forwards;
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
-@keyframes merge {
-    to {
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%) rotate(720deg);
-    }
-}
-
-.splatter {
-    animation: splatter 3s ease-out forwards;
-    background: rgba(0, 255, 150, 0.6);
-}
-
-@keyframes splatter {
-    to {
-        transform: translate(var(--x), var(--y)) scale(0.2);
-        opacity: 0;
-    }
+.explode {
+    transition: all 3s ease;
+    opacity: 0;
 }
 
 #introText {
@@ -98,11 +70,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.4em;
     text-align: center;
+    font-size: 1.4em;
     opacity: 0;
-    transition: opacity 1s;
-    z-index: 18;
+    transition: opacity 1.5s;
+    z-index: 45;
 }
 
 /* GAME */
@@ -117,14 +89,14 @@ body {
 #cookie {
     font-size: 9em;
     cursor: pointer;
-    animation: spin 6s linear infinite;
+    animation: cookieSpin 6s linear infinite;
 }
 
 #cookie.bounce {
-    animation: spin 6s linear infinite, bounce 0.25s ease;
+    animation: cookieSpin 6s linear infinite, bounce 0.25s ease;
 }
 
-@keyframes spin {
+@keyframes cookieSpin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
@@ -137,6 +109,7 @@ body {
 
 #stats {
     text-align: center;
+    font-size: 1.2em;
 }
 
 #buttons {
@@ -155,24 +128,27 @@ button {
 
 <body>
 
-<div id="overlay">
-    <div id="overlayText">Interact to enable sounds (required)</div>
-</div>
-
+<div id="overlay">Interact to enable sounds (required)</div>
 <div id="intro"></div>
 
 <div id="introText">
-    Мы вернулись. Спасибо за терпение.<br>
-    — canvayys
+Мы вернулись. Спасибо за терпение.<br>
+— canvayys
 </div>
 
 <div id="game">
     <div id="cookie">🍪</div>
     <div id="stats">
-        Cookies: <span id="cookies">0</span>
+        Cookies: <span id="cookies">0</span><br>
+        Click Power: <span id="clickPower">1</span><br>
+        Multiplier: x<span id="multiplier">1</span><br>
+        Auto/sec: <span id="auto">0</span>
     </div>
     <div id="buttons">
-        <button>More coming soon…</button>
+        <button id="buyClick">Buy x2 Click (50)</button>
+        <button id="buyAuto">Buy Auto Cookie +1/sec (200)</button>
+        <button id="buyMult">Buy x2 Multiplier (500)</button>
+        <button id="reset">Reset Progress</button>
     </div>
 </div>
 
@@ -180,28 +156,74 @@ button {
 <audio id="login" src="login.mp3"></audio>
 
 <script>
+let cookies = 0;
+let clickPower = 1;
+let multiplier = 1;
+let autoCookies = 0;
+let lastClick = 0;
+
+let prices = { click: 50, auto: 200, mult: 500 };
+
 const overlay = document.getElementById("overlay");
 const intro = document.getElementById("intro");
 const introText = document.getElementById("introText");
 const game = document.getElementById("game");
+const cookie = document.getElementById("cookie");
 const bgm = document.getElementById("bgm");
 const login = document.getElementById("login");
+
+const ui = {
+    cookies: document.getElementById("cookies"),
+    clickPower: document.getElementById("clickPower"),
+    multiplier: document.getElementById("multiplier"),
+    auto: document.getElementById("auto")
+};
+
+function updateUI() {
+    ui.cookies.textContent = cookies;
+    ui.clickPower.textContent = clickPower;
+    ui.multiplier.textContent = multiplier;
+    ui.auto.textContent = autoCookies;
+}
+
+function save() {
+    localStorage.setItem("ctg_save", JSON.stringify({
+        cookies, clickPower, multiplier, autoCookies, prices
+    }));
+}
+
+function load() {
+    const d = JSON.parse(localStorage.getItem("ctg_save"));
+    if (!d) return;
+    cookies = d.cookies;
+    clickPower = d.clickPower;
+    multiplier = d.multiplier;
+    autoCookies = d.autoCookies;
+    prices = d.prices;
+}
 
 overlay.onclick = () => {
     overlay.remove();
 
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+
     const orbs = [];
     for (let i = 0; i < 6; i++) {
-        const orb = document.createElement("div");
-        orb.className = "orb";
-        orb.style.left = Math.random() * 100 + "%";
-        orb.style.top = Math.random() * 100 + "%";
-        intro.appendChild(orb);
-        orbs.push(orb);
+        const o = document.createElement("div");
+        o.className = "orb";
+        o.style.left = Math.random() * window.innerWidth + "px";
+        o.style.top = Math.random() * window.innerHeight + "px";
+        intro.appendChild(o);
+        orbs.push(o);
     }
 
     setTimeout(() => {
-        orbs.forEach(o => o.classList.add("merge"));
+        orbs.forEach(o => {
+            o.style.left = centerX + "px";
+            o.style.top = centerY + "px";
+        });
+        intro.classList.add("spinGroup");
     }, 2000);
 
     setTimeout(() => {
@@ -209,19 +231,71 @@ overlay.onclick = () => {
         introText.style.opacity = 1;
 
         orbs.forEach(o => {
-            o.style.setProperty("--x", `${(Math.random() - 0.5) * 800}px`);
-            o.style.setProperty("--y", `${(Math.random() - 0.5) * 600}px`);
-            o.classList.add("splatter");
+            o.style.left = centerX + (Math.random() - 0.5) * 900 + "px";
+            o.style.top = centerY + (Math.random() - 0.5) * 700 + "px";
+            o.classList.add("explode");
         });
     }, 5000);
 
     setTimeout(() => {
         introText.style.opacity = 0;
         intro.remove();
-        game.style.display = "flex";
+        bgm.volume = 0.6;
         bgm.play();
+        load();
+        updateUI();
+        game.style.display = "flex";
     }, 9000);
 };
+
+cookie.onclick = () => {
+    const now = Date.now();
+    if (now - lastClick < 400) return;
+    lastClick = now;
+
+    cookies += clickPower * multiplier;
+    cookie.classList.add("bounce");
+    setTimeout(() => cookie.classList.remove("bounce"), 250);
+
+    updateUI();
+    save();
+};
+
+document.getElementById("buyClick").onclick = () => {
+    if (cookies < prices.click) return;
+    cookies -= prices.click;
+    clickPower *= 2;
+    prices.click *= 2;
+    updateUI(); save();
+};
+
+document.getElementById("buyAuto").onclick = () => {
+    if (cookies < prices.auto) return;
+    cookies -= prices.auto;
+    autoCookies++;
+    prices.auto *= 2;
+    updateUI(); save();
+};
+
+document.getElementById("buyMult").onclick = () => {
+    if (cookies < prices.mult) return;
+    cookies -= prices.mult;
+    multiplier *= 2;
+    prices.mult *= 2;
+    updateUI(); save();
+};
+
+document.getElementById("reset").onclick = () => {
+    if (!confirm("Reset ALL progress?")) return;
+    localStorage.removeItem("ctg_save");
+    location.reload();
+};
+
+setInterval(() => {
+    cookies += autoCookies * multiplier;
+    updateUI();
+    save();
+}, 1000);
 </script>
 
 </body>
