@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>CTGBeta 2.4</title>
+<title>CTGBeta 2.5</title>
 <style>
 *{box-sizing:border-box;}
 body{margin:0;height:100vh;background:black;overflow:hidden;font-family:Arial,sans-serif;color:white;display:flex;justify-content:center;align-items:center;user-select:none;position:relative;transition:background 2s ease;}
@@ -101,37 +101,19 @@ function addAchievement(n){if(!achievements[n]){achievements[n]=true;alert("Achi
 function handleCookieClick(e){let v=clickPower*multiplier;cookies+=v;createFloatingText(e.clientX,e.clientY,v);if(cookies>=1e6)addAchievement("Glitch (RARE)");if(cookies>=1e9)addAchievement("Mega Cookie");if(cookies>=1e12)addAchievement("Trillionaire");if(cookies>=1e15)addAchievement("Quadrillionaire");if(cookies>=1e18)addAchievement("Quintillionaire");if(cookies>=1e21)addAchievement("Septillionaire");if(cookies>=1e30&&!glitchMode)startGlitchCutscene();if(glitchMode)teleportCookie();updateUI();save();}
 function teleportCookie(){const x=Math.random()*(window.innerWidth-100)+50;const y=Math.random()*(window.innerHeight-100)+50;cookie.style.left=x+"px";cookie.style.top=y+"px";cookie.style.position="absolute";}
 function startGlitchCutscene(){
-    glitchMode = true;
-    save();
-
-    let g = document.createElement("div");
-    g.className = "glitch";
-    g.style.pointerEvents = "none";
-    document.body.appendChild(g);
-
-    document.title = "CTGAlpha 1.0 coming soon... ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN";
-
-    glitching.currentTime = 0;
-    glitching.loop = true;
-    glitching.play().catch(()=>{});
-
-    let flashCount = 0;
-    const flashInterval = setInterval(()=>{
-        document.body.style.background = flashCount % 2 === 0 ? "#ff0000" : "#000000";
-        flashCount++;
-        if(flashCount >= 10){
-            clearInterval(flashInterval);
-            glitching.pause();
-            enditall.currentTime = 0;
-            enditall.play().catch(()=>{});
-            document.body.style.background = "linear-gradient(120deg,#1a1a1a,#0a0a0a,#111a33)";
-        }
-    }, 500);
-
+    glitchMode=true; save();
+    let g=document.createElement("div");
+    g.className="glitch"; g.style.pointerEvents="none"; document.body.appendChild(g);
+    document.title="CTGAlpha 1.0 coming soon... ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN";
+    glitching.currentTime=0; glitching.loop=true; glitching.play().catch(()=>{});
+    let flashCount=0; const flashInterval=setInterval(()=>{
+        document.body.style.background=flashCount%2===0?"#ff0000":"#000000"; flashCount++;
+        if(flashCount>=10){ clearInterval(flashInterval); glitching.pause(); enditall.currentTime=0; enditall.play().catch(()=>{}); document.body.style.background="linear-gradient(120deg,#1a1a1a,#0a0a0a,#111a33)";}
+    },500);
     alert("Glitch Mode activated! Cannot stop until 10000No (1e33 cookies).");
 }
 function resumeGlitch(){document.body.innerHTML+="<div class='glitch'></div>";document.title="CTGAlpha 1.0 coming soon... ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN";enditall.currentTime=0;enditall.play();}
-function endGlitch(){enditall.pause();enditall.currentTime=0;document.querySelector(".glitch")?.remove();glitchMode=false;document.title="CTGBeta 2.4";save();alert("Glitch ended! You may continue playing.");}
+function endGlitch(){enditall.pause();enditall.currentTime=0;document.querySelector(".glitch")?.remove();glitchMode=false;document.title="CTGBeta 2.5";save();alert("Glitch ended! You may continue playing.");}
 
 overlay.onclick=()=>{
 overlay.remove();
@@ -148,9 +130,7 @@ document.getElementById("buyClick").onclick=()=>{if(cookies<prices.click)return;
 document.getElementById("buyAuto").onclick=()=>{if(cookies<prices.auto)return;cookies-=prices.auto;autoCookies++;prices.auto*=2;updateUI();save();}
 document.getElementById("buyMult").onclick=()=>{if(cookies<prices.mult)return;cookies-=prices.mult;multiplier*=2;prices.mult*=2;updateUI();save();}
 document.getElementById("mute").onclick=()=>{if(!glitchMode)bgm.muted=!bgm.muted;}
-document.getElementById("achievementsBtn").onclick=()=>{
-achPanel.style.display=achPanel.style.display==="flex"?"none":"flex";
-achPanel.innerHTML="<h3>Achievements</h3>"+Object.keys(achievements).map(a=>"<p>"+a+"</p>").join("");}
+document.getElementById("achievementsBtn").onclick=()=>{achPanel.style.display=achPanel.style.display==="flex"?"none":"flex"; achPanel.innerHTML="<h3>Achievements</h3>"+Object.keys(achievements).map(a=>"<p>"+a+"</p>").join("");}
 document.getElementById("reset").onclick=()=>{if(!confirm("Reset ALL progress?"))return;localStorage.removeItem("ctg_save");location.reload();}
 closeNews.onclick=()=>{newsPage.style.display="none";}
 document.body.addEventListener("click",(e)=>{createClickSpot(e.clientX,e.clientY);});
