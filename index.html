@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>CTGBeta 1.1</title>
-
 <style>
 * { box-sizing: border-box; }
 
@@ -19,7 +18,6 @@ body {
     align-items: center;
     user-select: none;
 }
-
 
 #overlay {
     position: fixed;
@@ -49,7 +47,7 @@ body {
     transition: all 3s ease;
 }
 
-.spinGroup {
+.spinGroup .orb {
     animation: spin 2s linear infinite;
 }
 
@@ -61,6 +59,7 @@ body {
 .explode {
     transition: all 3s ease;
     opacity: 0;
+    transform: scale(0.1);
 }
 
 #introText {
@@ -75,7 +74,6 @@ body {
     transition: opacity 1.5s;
     z-index: 45;
 }
-
 
 #game {
     display: none;
@@ -123,7 +121,6 @@ button {
 }
 </style>
 </head>
-
 <body>
 
 <div id="overlay">Interact to enable sounds (required)</div>
@@ -206,13 +203,17 @@ overlay.onclick = () => {
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
 
+    const orbContainer = document.createElement("div");
+    orbContainer.className = "spinGroup";
+    intro.appendChild(orbContainer);
+
     const orbs = [];
     for (let i = 0; i < 6; i++) {
         const o = document.createElement("div");
         o.className = "orb";
         o.style.left = Math.random() * window.innerWidth + "px";
         o.style.top = Math.random() * window.innerHeight + "px";
-        intro.appendChild(o);
+        orbContainer.appendChild(o);
         orbs.push(o);
     }
 
@@ -221,7 +222,6 @@ overlay.onclick = () => {
             o.style.left = centerX + "px";
             o.style.top = centerY + "px";
         });
-        intro.classList.add("spinGroup");
     }, 2000);
 
     setTimeout(() => {
@@ -229,8 +229,8 @@ overlay.onclick = () => {
         introText.style.opacity = 1;
 
         orbs.forEach(o => {
-            o.style.left = centerX + (Math.random() - 0.5) * 900 + "px";
-            o.style.top = centerY + (Math.random() - 0.5) * 700 + "px";
+            o.style.left = centerX + (Math.random() - 0.5) * 600 + "px";
+            o.style.top = centerY + (Math.random() - 0.5) * 400 + "px";
             o.classList.add("explode");
         });
     }, 5000);
@@ -239,7 +239,7 @@ overlay.onclick = () => {
         introText.style.opacity = 0;
         intro.remove();
         bgm.volume = 0.6;
-        bgm.play();
+        bgm.play().catch(()=>{});
         load();
         updateUI();
         game.style.display = "flex";
