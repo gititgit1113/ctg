@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>CTGBeta 1.4</title>
+<title>CTGBeta 1.5</title>
 <style>
 * { box-sizing: border-box; }
 
@@ -237,30 +237,32 @@ function load() {
     prices = d.prices;
 }
 
-function createClickEffect(x, y, value) {
+function createClickSpot(x, y) {
     const spot = document.createElement("div");
     spot.className = "clickSpot";
     spot.style.left = x + "px";
     spot.style.top = y + "px";
     document.body.appendChild(spot);
     setTimeout(() => spot.remove(), 500);
-
-    if(value > 0){
-        const floatText = document.createElement("div");
-        floatText.className = "floatingText";
-        floatText.style.left = x + "px";
-        floatText.style.top = y + "px";
-        floatText.textContent = "+" + value;
-        document.body.appendChild(floatText);
-        setTimeout(() => floatText.remove(), 1000);
-    }
 }
 
-function handleClick(e, value) {
+function createFloatingText(x, y, value) {
+    if(value <= 0) return;
+    const floatText = document.createElement("div");
+    floatText.className = "floatingText";
+    floatText.style.left = x + "px";
+    floatText.style.top = y + "px";
+    floatText.textContent = "+" + value;
+    document.body.appendChild(floatText);
+    setTimeout(() => floatText.remove(), 1000);
+}
+
+function handleCookieClick(e) {
+    const value = clickPower * multiplier;
     cookies += value;
     clickSfx.currentTime = 0;
     clickSfx.play().catch(()=>{});
-    createClickEffect(e.clientX, e.clientY, value);
+    createFloatingText(e.clientX, e.clientY, value);
     updateUI();
     save();
 }
@@ -314,15 +316,8 @@ overlay.onclick = () => {
     }, 9000);
 };
 
-document.body.addEventListener("click", (e) => {
-    if(e.target.tagName === "BUTTON" || e.target.id === "cookie"){
-        return;
-    }
-    handleClick(e, clickPower * multiplier);
-});
-
 cookie.onclick = (e) => {
-    handleClick(e, clickPower * multiplier);
+    handleCookieClick(e);
     cookie.classList.add("bounce");
     setTimeout(() => cookie.classList.remove("bounce"), 250);
 };
@@ -332,7 +327,8 @@ document.getElementById("buyClick").onclick = (e) => {
     cookies -= prices.click;
     clickPower *= 2;
     prices.click *= 2;
-    handleClick(e, 0);
+    clickSfx.currentTime = 0;
+    clickSfx.play().catch(()=>{});
 };
 
 document.getElementById("buyAuto").onclick = (e) => {
@@ -340,7 +336,8 @@ document.getElementById("buyAuto").onclick = (e) => {
     cookies -= prices.auto;
     autoCookies++;
     prices.auto *= 2;
-    handleClick(e, 0);
+    clickSfx.currentTime = 0;
+    clickSfx.play().catch(()=>{});
 };
 
 document.getElementById("buyMult").onclick = (e) => {
@@ -348,15 +345,19 @@ document.getElementById("buyMult").onclick = (e) => {
     cookies -= prices.mult;
     multiplier *= 2;
     prices.mult *= 2;
-    handleClick(e, 0);
+    clickSfx.currentTime = 0;
+    clickSfx.play().catch(()=>{});
 };
 
-document.getElementById("reset").onclick = (e) => {
+document.getElementById("reset").onclick = () => {
     if (!confirm("Reset ALL progress?")) return;
     localStorage.removeItem("ctg_save");
-    handleClick(e, 0);
     location.reload();
 };
+
+document.body.addEventListener("click", (e) => {
+    createClickSpot(e.clientX, e.clientY);
+});
 
 setInterval(() => {
     cookies += autoCookies * multiplier;
