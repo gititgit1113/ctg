@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>CTGBeta 2.2</title>
+<title>CTGBeta 2.3</title>
 <style>
 *{box-sizing:border-box;}
 body{margin:0;height:100vh;background:black;overflow:hidden;font-family:Arial,sans-serif;color:white;display:flex;justify-content:center;align-items:center;user-select:none;position:relative;transition:background 2s ease;}
@@ -43,7 +43,7 @@ button{padding:10px 18px;font-size:1em;cursor:pointer;position:relative;}
 <li>Click effects everywhere</li>
 <li>Multiplier price doubles per purchase</li>
 <li>Achievements added</li>
-<li>undefined</li>
+<li>Glitch cutscene at the end</li>
 </ul>
 <button id="closeNews">Close</button>
 </div>
@@ -72,11 +72,10 @@ Auto/sec: <span id="auto">0</span>
 <audio id="login" src="login.mp3"></audio>
 <audio id="clickSfx" src="click.mp3"></audio>
 <audio id="glitching" src="glitching.mp3"></audio>
-<audio id="stopitall" src="enditall.mp3" loop></audio>
+<audio id="enditall" src="enditall.mp3" loop></audio>
 
 <script>
-let cookies=0, clickPower=1, multiplier=1, autoCookies=0, prices={click:50, auto:200, mult:500}, achievements={}, glitchMode=false;
-
+let cookies=0, clickPower=1, multiplier=1, autoCookies=0, prices={click:50,auto:200,mult:500}, achievements={}, glitchMode=false;
 const overlay=document.getElementById("overlay");
 const intro=document.getElementById("intro");
 const introText=document.getElementById("introText");
@@ -86,95 +85,46 @@ const bgm=document.getElementById("bgm");
 const login=document.getElementById("login");
 const clickSfx=document.getElementById("clickSfx");
 const glitching=document.getElementById("glitching");
-const stopitall=document.getElementById("stopitall");
+const enditall=document.getElementById("enditall");
 const newsPage=document.getElementById("newsPage");
 const closeNews=document.getElementById("closeNews");
 const achPanel=document.getElementById("achievementsPanel");
+const ui={cookies:document.getElementById("cookies"),clickPower:document.getElementById("clickPower"),multiplier:document.getElementById("multiplier"),auto:document.getElementById("auto")};
 
-const ui={cookies:document.getElementById("cookies"), clickPower:document.getElementById("clickPower"), multiplier:document.getElementById("multiplier"), auto:document.getElementById("auto")};
-
-function formatNumber(n){
-const units=[{value:1e3,symbol:"K"},{value:1e6,symbol:"M"},{value:1e9,symbol:"B"},{value:1e12,symbol:"T"},{value:1e15,symbol:"Qa"},{value:1e18,symbol:"Qi"},{value:1e21,symbol:"S"},{value:1e24,symbol:"Sp"},{value:1e27,symbol:"Oc"},{value:1e30,symbol:"No"}];
-for(let i=units.length-1;i>=0;i--){if(n>=units[i].value){return(n/units[i].value).toFixed(2).replace(/\.00$/,'')+units[i].symbol;}}
-return n.toString();
-}
-
-function updateUI(){
-ui.cookies.textContent=formatNumber(cookies);
-ui.clickPower.textContent=formatNumber(clickPower);
-ui.multiplier.textContent=formatNumber(multiplier);
-ui.auto.textContent=formatNumber(autoCookies);
-document.getElementById("buyClick").textContent=`Buy x2 Click (${prices.click})`;
-document.getElementById("buyAuto").textContent=`Buy Auto Cookie +1/sec (${prices.auto})`;
-document.getElementById("buyMult").textContent=`Buy x2 Multiplier (${prices.mult})`;
-}
-
+function formatNumber(n){const u=[{v:1e3,s:"K"},{v:1e6,s:"M"},{v:1e9,s:"B"},{v:1e12,s:"T"},{v:1e15,s:"Qa"},{v:1e18,s:"Qi"},{v:1e21,s:"S"},{v:1e24,s:"Sp"},{v:1e27,s:"Oc"},{v:1e30,s:"No"}];for(let i=u.length-1;i>=0;i--){if(n>=u[i].v){return(n/u[i].v).toFixed(2).replace(/\.00$/,'')+u[i].s;}}return n.toString();}
+function updateUI(){ui.cookies.textContent=formatNumber(cookies);ui.clickPower.textContent=formatNumber(clickPower);ui.multiplier.textContent=formatNumber(multiplier);ui.auto.textContent=formatNumber(autoCookies);document.getElementById("buyClick").textContent=`Buy x2 Click (${prices.click})`;document.getElementById("buyAuto").textContent=`Buy Auto Cookie +1/sec (${prices.auto})`;document.getElementById("buyMult").textContent=`Buy x2 Multiplier (${prices.mult})`;}
 function save(){localStorage.setItem("ctg_save",JSON.stringify({cookies,clickPower,multiplier,autoCookies,prices,achievements,glitchMode}));}
-function load(){const d=JSON.parse(localStorage.getItem("ctg_save"));if(!d)return;cookies=d.cookies;clickPower=d.clickPower;multiplier=d.multiplier;autoCookies=d.autoCookies;prices=d.prices;achievements=d.achievements||{};glitchMode=d.glitchMode||false;}
+function load(){const d=JSON.parse(localStorage.getItem("ctg_save"));if(!d)return;cookies=d.cookies;clickPower=d.clickPower;multiplier=d.multiplier;autoCookies=d.autoCookies;prices=d.prices;achievements=d.achievements||{};glitchMode=d.glitchMode||false;if(glitchMode)resumeGlitch();}
 
 function createClickSpot(x,y){const s=document.createElement("div");s.className="clickSpot";s.style.left=x+"px";s.style.top=y+"px";document.body.appendChild(s);clickSfx.currentTime=0;clickSfx.play().catch(()=>{});setTimeout(()=>s.remove(),500);}
-function createFloatingText(x,y,value){if(value<=0)return;const f=document.createElement("div");f.className="floatingText";f.style.left=x+"px";f.style.top=y+"px";f.textContent="+"+value;document.body.appendChild(f);setTimeout(()=>f.remove(),1000);}
-function addAchievement(name){if(!achievements[name]){achievements[name]=true;alert("Achievement unlocked: "+name);save();}}
+function createFloatingText(x,y,v){if(v<=0)return;const f=document.createElement("div");f.className="floatingText";f.style.left=x+"px";f.style.top=y+"px";f.textContent="+"+v;document.body.appendChild(f);setTimeout(()=>f.remove(),1000);}
+function addAchievement(n){if(!achievements[n]){achievements[n]=true;alert("Achievement unlocked: "+n);save();}}
 
-function handleCookieClick(e){
-let value=clickPower*multiplier;cookies+=value;
-if(cookies>=1e6)addAchievement("Glitch (RARE)");
-if(cookies>=1e9)addAchievement("Mega Cookie");
-if(cookies>=1e12)addAchievement("Trillionaire");
-if(cookies>=1e15)addAchievement("Quadrillionaire");
-if(cookies>=1e18)addAchievement("Quintillionaire");
-if(cookies>=1e21)addAchievement("Septillionaire");
-if(cookies>=1e30 && !glitchMode)startGlitchCutscene();
-if(glitchMode)teleportCookie();
-createFloatingText(e.clientX,e.clientY,value);
-updateUI();save();
-}
+function handleCookieClick(e){let v=clickPower*multiplier;cookies+=v;createFloatingText(e.clientX,e.clientY,v);if(cookies>=1e6)addAchievement("Glitch (RARE)");if(cookies>=1e9)addAchievement("Mega Cookie");if(cookies>=1e12)addAchievement("Trillionaire");if(cookies>=1e15)addAchievement("Quadrillionaire");if(cookies>=1e18)addAchievement("Quintillionaire");if(cookies>=1e21)addAchievement("Septillionaire");if(cookies>=1e30&&!glitchMode)startGlitchCutscene();if(glitchMode)teleportCookie();updateUI();save();}
 
-function teleportCookie(){
-const x=Math.random()*(window.innerWidth-100)+50;
-const y=Math.random()*(window.innerHeight-100)+50;
-cookie.style.left=x+"px";cookie.style.top=y+"px";cookie.style.position="absolute";
-}
+function teleportCookie(){const x=Math.random()*(window.innerWidth-100)+50;const y=Math.random()*(window.innerHeight-100)+50;cookie.style.left=x+"px";cookie.style.top=y+"px";cookie.style.position="absolute";}
 
-function startGlitchCutscene(){
-glitchMode=true;
-save();
-document.body.innerHTML+="<div class='glitch'></div>";
-document.title="CTGAlpha 1.0 coming soon... ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN";
-glitching.play();
-let flash=0;
-const flashInterval=setInterval(()=>{
-document.body.style.background=flash%2==0?"#ff0000":"#000";
-flash++;
-if(flash>=10){clearInterval(flashInterval);glitching.pause();stopitall.play();}},500);
-alert("Glitch Mode activated! You cannot stop it until 10000No (1e33 cookies).");
-}
+function startGlitchCutscene(){glitchMode=true;save();document.body.innerHTML+="<div class='glitch'></div>";document.title="CTGAlpha 1.0 coming soon... ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN";glitching.play();let f=0;const fi=setInterval(()=>{document.body.style.background=f%2==0?"#ff0000":"#000";f++;if(f>=10){clearInterval(fi);glitching.pause();enditall.play();}},500);alert("Glitch Mode activated! Cannot stop until 10000No (1e33 cookies).");}
 
-function endGlitch(){
-stopitall.pause();stopitall.currentTime=0;
-document.querySelector(".glitch")?.remove();
-document.title="CTGBeta 2.2";
-glitchMode=false;
-save();
-alert("Glitch ended! You may continue playing.");
-}
+function resumeGlitch(){document.body.innerHTML+="<div class='glitch'></div>";document.title="CTGAlpha 1.0 coming soon... ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN";enditall.play();}
+
+function endGlitch(){enditall.pause();enditall.currentTime=0;document.querySelector(".glitch")?.remove();glitchMode=false;document.title="CTGBeta 2.3";save();alert("Glitch ended! You may continue playing.");}
 
 overlay.onclick=()=>{
 overlay.remove();
-const centerX=window.innerWidth/2;
-const centerY=window.innerHeight/2;
-const orbContainer=document.createElement("div");orbContainer.className="spinGroup";intro.appendChild(orbContainer);
-const orbs=[];for(let i=0;i<6;i++){const o=document.createElement("div");o.className="orb";o.style.left=Math.random()*window.innerWidth+"px";o.style.top=Math.random()*window.innerHeight+"px";orbContainer.appendChild(o);orbs.push(o);}
-setTimeout(()=>{orbs.forEach(o=>{o.style.left=centerX+"px";o.style.top=centerY+"px";})},2000);
-setTimeout(()=>{login.play();introText.style.opacity=1;orbs.forEach(o=>{o.style.left=centerX+(Math.random()-0.5)*600+"px";o.style.top=centerY+(Math.random()-0.5)*400+"px";o.classList.add("explode");})},5000);
-setTimeout(()=>{introText.style.opacity=0;intro.remove();document.body.style.background="linear-gradient(120deg, #1a1a1a, #0a0a0a, #111a33)";bgm.volume=0.6;bgm.play().catch(()=>{});newsPage.style.display="flex";load();updateUI();game.style.display="flex";},9000);
+const cx=window.innerWidth/2,cy=window.innerHeight/2;
+const oc=document.createElement("div");oc.className="spinGroup";intro.appendChild(oc);
+const orbs=[];for(let i=0;i<6;i++){const o=document.createElement("div");o.className="orb";o.style.left=Math.random()*window.innerWidth+"px";o.style.top=Math.random()*window.innerHeight+"px";oc.appendChild(o);orbs.push(o);}
+setTimeout(()=>{orbs.forEach(o=>{o.style.left=cx+"px";o.style.top=cy+"px";})},2000);
+setTimeout(()=>{login.play();introText.style.opacity=1;orbs.forEach(o=>{o.style.left=cx+(Math.random()-0.5)*600+"px";o.style.top=cy+(Math.random()-0.5)*400+"px";o.classList.add("explode");})},5000);
+setTimeout(()=>{introText.style.opacity=0;intro.remove();document.body.style.background="linear-gradient(120deg,#1a1a1a,#0a0a0a,#111a33)";bgm.volume=0.6;bgm.play().catch(()=>{});newsPage.style.display="flex";load();updateUI();game.style.display="flex";},9000);
 };
 
 cookie.onclick=(e)=>{handleCookieClick(e);cookie.classList.add("bounce");setTimeout(()=>cookie.classList.remove("bounce"),250);}
-document.getElementById("buyClick").onclick=(e)=>{if(cookies<prices.click)return;cookies-=prices.click;clickPower*=2;prices.click*=2;updateUI();save();}
-document.getElementById("buyAuto").onclick=(e)=>{if(cookies<prices.auto)return;cookies-=prices.auto;autoCookies++;prices.auto*=2;updateUI();save();}
-document.getElementById("buyMult").onclick=(e)=>{if(cookies<prices.mult)return;cookies-=prices.mult;multiplier*=2;prices.mult*=2;updateUI();save();}
-document.getElementById("mute").onclick=()=>{bgm.muted=!bgm.muted;}
+document.getElementById("buyClick").onclick=()=>{if(cookies<prices.click)return;cookies-=prices.click;clickPower*=2;prices.click*=2;updateUI();save();}
+document.getElementById("buyAuto").onclick=()=>{if(cookies<prices.auto)return;cookies-=prices.auto;autoCookies++;prices.auto*=2;updateUI();save();}
+document.getElementById("buyMult").onclick=()=>{if(cookies<prices.mult)return;cookies-=prices.mult;multiplier*=2;prices.mult*=2;updateUI();save();}
+document.getElementById("mute").onclick=()=>{if(!glitchMode)bgm.muted=!bgm.muted;}
 document.getElementById("achievementsBtn").onclick=()=>{
 achPanel.style.display=achPanel.style.display==="flex"?"none":"flex";
 achPanel.innerHTML="<h3>Achievements</h3>"+Object.keys(achievements).map(a=>"<p>"+a+"</p>").join("");}
@@ -183,9 +133,7 @@ closeNews.onclick=()=>{newsPage.style.display="none";}
 document.body.addEventListener("click",(e)=>{createClickSpot(e.clientX,e.clientY);});
 setInterval(()=>{
 if(!glitchMode){cookies+=autoCookies*multiplier;updateUI();save();}
-else if(cookies>=1e33){stopitall.pause();stopitall.currentTime=0;
-const cont=confirm("Glitch Ended! Reset or Continue?\nPress OK to Continue, Cancel to Reset.");if(cont)endGlitch();else location.reload();}},1000);
-
+else if(cookies>=1e33){const c=confirm("Glitch reached 1e33! Reset or Continue?\nOK=Continue, Cancel=Reset");if(c)endGlitch();else location.reload();}},1000);
 </script>
 </body>
 </html>
