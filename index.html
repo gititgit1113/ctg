@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>CTGBeta 1.5</title>
+<title>CTGBeta 1.6</title>
 <style>
 * { box-sizing: border-box; }
 
@@ -243,6 +243,8 @@ function createClickSpot(x, y) {
     spot.style.left = x + "px";
     spot.style.top = y + "px";
     document.body.appendChild(spot);
+    clickSfx.currentTime = 0;
+    clickSfx.play().catch(()=>{});
     setTimeout(() => spot.remove(), 500);
 }
 
@@ -356,6 +358,7 @@ document.getElementById("reset").onclick = () => {
 };
 
 document.body.addEventListener("click", (e) => {
+    if(e.target === cookie || e.target.tagName === "BUTTON") return;
     createClickSpot(e.clientX, e.clientY);
 });
 
