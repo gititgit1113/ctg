@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>CTGBeta 1.7</title>
+<title>CTGBeta 2.1</title>
 <style>
 * { box-sizing: border-box; }
 
@@ -21,196 +21,64 @@ body {
     transition: background 2s ease;
 }
 
-#overlay {
-    position: fixed;
-    inset: 0;
-    background: black;
-    z-index: 50;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-}
-
-#intro {
-    position: fixed;
-    inset: 0;
-    z-index: 40;
-}
-
-.orb {
-    position: absolute;
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: rgba(0, 140, 255, 0.7);
-    filter: blur(35px);
-    transition: all 3s ease;
-    pointer-events: none;
-}
-
-.spinGroup .orb {
-    animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.explode {
-    transition: all 3s ease;
-    opacity: 0;
-    transform: scale(0.1);
-}
-
-#introText {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    font-size: 1.4em;
-    opacity: 0;
-    transition: opacity 1.5s;
-    z-index: 45;
-    pointer-events: none;
-}
-
-#newsPage {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: #111a33dd;
-    color: white;
-    z-index: 1002;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 20px;
-    font-size: 1.2em;
-}
-
-#game {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    z-index: 10;
-}
-
-#cookie {
-    font-size: 9em;
-    cursor: pointer;
-    animation: cookieSpin 6s linear infinite;
-    position: relative;
-}
-
-#cookie.bounce {
-    animation: cookieSpin 6s linear infinite, bounce 0.25s ease;
-}
-
-@keyframes cookieSpin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-@keyframes bounce {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.35); }
-    100% { transform: scale(1); }
-}
-
-#stats {
-    text-align: center;
-    font-size: 1.2em;
-}
-
-#buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-button {
-    padding: 10px 18px;
-    font-size: 1em;
-    cursor: pointer;
-    position: relative;
-}
-
-.clickSpot {
-    position: fixed;
-    width: 50px;
-    height: 50px;
-    background: white;
-    border-radius: 50%;
-    opacity: 0.8;
-    pointer-events: none;
-    transform: translate(-50%, -50%);
-    animation: fadeSpot 0.5s forwards;
-    z-index: 1000;
-}
-
-@keyframes fadeSpot {
-    0% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
-    100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
-}
-
-.floatingText {
-    position: fixed;
-    color: #fff;
-    font-weight: bold;
-    pointer-events: none;
-    animation: floatUp 1s forwards;
-    font-size: 1.2em;
-    z-index: 1001;
-}
-
-@keyframes floatUp {
-    0% { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
-    100% { opacity: 0; transform: translate(-50%, -50%) translateY(-40px); }
-}
+#overlay { position: fixed; inset: 0; background: black; z-index: 50; display:flex; justify-content:center; align-items:center; cursor:pointer; }
+#intro { position: fixed; inset: 0; z-index: 40; }
+.orb { position: absolute; width: 120px; height: 120px; border-radius:50%; background: rgba(0,140,255,0.7); filter:blur(35px); transition:all 3s ease; pointer-events:none; }
+.spinGroup .orb { animation: spin 2s linear infinite; }
+@keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+.explode { transition: all 3s ease; opacity:0; transform:scale(0.1); }
+#introText { position:fixed; inset:0; display:flex; justify-content:center; align-items:center; text-align:center; font-size:1.4em; opacity:0; transition:opacity 1.5s; z-index:45; pointer-events:none; }
+#newsPage { display:none; position:fixed; inset:0; background:#111a33dd; color:white; z-index:1002; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; font-size:1.2em; }
+#game { display:none; flex-direction:column; align-items:center; gap:16px; z-index:10; }
+#cookie { font-size:9em; cursor:pointer; animation: cookieSpin 6s linear infinite; position:relative; }
+#cookie.bounce { animation: cookieSpin 6s linear infinite, bounce 0.25s ease; }
+@keyframes cookieSpin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+@keyframes bounce { 0% { transform:scale(1); } 50% { transform:scale(1.35); } 100% { transform:scale(1); } }
+#stats { text-align:center; font-size:1.2em; }
+#buttons { display:flex; flex-direction:column; gap:8px; }
+button { padding:10px 18px; font-size:1em; cursor:pointer; position:relative; }
+.clickSpot { position:fixed; width:50px; height:50px; background:white; border-radius:50%; opacity:0.8; pointer-events:none; transform:translate(-50%,-50%); animation:fadeSpot 0.5s forwards; z-index:1000; }
+@keyframes fadeSpot {0% {opacity:0.8; transform:translate(-50%,-50%) scale(1);} 100% {opacity:0; transform:translate(-50%,-50%) scale(2);}}
+.floatingText { position:fixed; color:#fff; font-weight:bold; pointer-events:none; animation:floatUp 1s forwards; font-size:1.2em; z-index:1001; }
+@keyframes floatUp {0% {opacity:1; transform:translate(-50%,-50%) translateY(0);} 100% {opacity:0; transform:translate(-50%,-50%) translateY(-40px);}}
+.glitch { position:absolute; top:0; left:0; width:100%; height:100%; background:black; color:#0ff; font-family:monospace; overflow:hidden; pointer-events:none; z-index:9999; mix-blend-mode:difference; animation:glitchAnim 0.3s infinite;}
+@keyframes glitchAnim {0%{transform:translate(0,0);} 25%{transform:translate(5px,-5px);} 50%{transform:translate(-5px,5px);} 75%{transform:translate(5px,5px);} 100%{transform:translate(0,0);}}
 </style>
 </head>
 <body>
 
 <div id="overlay">Interact to enable sounds (required)</div>
 <div id="intro"></div>
-
-<div id="introText">
-Мы вернулись. Спасибо за терпение.<br>
-— canvayys
-</div>
+<div id="introText">Мы вернулись. Спасибо за терпение.<br>— canvayys</div>
 
 <div id="newsPage">
 <h2>CTGBeta News</h2>
 <p>Welcome back! Here's what's new:</p>
 <ul>
-<li>New click effects everywhere</li>
-<li>Multiplier price now doubles per purchase</li>
-<li>Mute background music button added</li>
+<li>Click effects everywhere</li>
+<li>Multiplier price doubles per purchase</li>
+<li>Mute music button added</li>
+<li>Achievements added</li>
+<li>Glitch cutscene at the end</li>
 </ul>
 <button id="closeNews">Close</button>
 </div>
 
 <div id="game">
-    <div id="cookie">🍪</div>
-    <div id="stats">
-        Cookies: <span id="cookies">0</span><br>
-        Click Power: <span id="clickPower">1</span><br>
-        Multiplier: x<span id="multiplier">1</span><br>
-        Auto/sec: <span id="auto">0</span>
-    </div>
-    <div id="buttons">
-        <button id="buyClick">Buy x2 Click (50)</button>
-        <button id="buyAuto">Buy Auto Cookie +1/sec (200)</button>
-        <button id="buyMult">Buy x2 Multiplier (500)</button>
-        <button id="mute">Mute/Unmute Music</button>
-        <button id="reset">Reset Progress</button>
-    </div>
+<div id="cookie">🍪</div>
+<div id="stats">
+Cookies: <span id="cookies">0</span><br>
+Click Power: <span id="clickPower">1</span><br>
+Multiplier: x<span id="multiplier">1</span><br>
+Auto/sec: <span id="auto">0</span>
+</div>
+<div id="buttons">
+<button id="buyClick">Buy x2 Click (50)</button>
+<button id="buyAuto">Buy Auto Cookie +1/sec (200)</button>
+<button id="buyMult">Buy x2 Multiplier (500)</button>
+<button id="mute">Mute/Unmute Music</button>
+<button id="reset">Reset Progress</button>
+</div>
 </div>
 
 <audio id="bgm" src="backgroundmusic.mp3" loop></audio>
@@ -218,192 +86,89 @@ button {
 <audio id="clickSfx" src="click.mp3"></audio>
 
 <script>
-let cookies = 0;
-let clickPower = 1;
-let multiplier = 1;
-let autoCookies = 0;
-let prices = { click: 50, auto: 200, mult: 500 };
+let cookies=0, clickPower=1, multiplier=1, autoCookies=0, prices={click:50, auto:200, mult:500}, achievements={}, glitchMode=false;
 
-const overlay = document.getElementById("overlay");
-const intro = document.getElementById("intro");
-const introText = document.getElementById("introText");
-const game = document.getElementById("game");
-const cookie = document.getElementById("cookie");
-const bgm = document.getElementById("bgm");
-const login = document.getElementById("login");
-const clickSfx = document.getElementById("clickSfx");
-const newsPage = document.getElementById("newsPage");
-const closeNews = document.getElementById("closeNews");
+const overlay=document.getElementById("overlay");
+const intro=document.getElementById("intro");
+const introText=document.getElementById("introText");
+const game=document.getElementById("game");
+const cookie=document.getElementById("cookie");
+const bgm=document.getElementById("bgm");
+const login=document.getElementById("login");
+const clickSfx=document.getElementById("clickSfx");
+const newsPage=document.getElementById("newsPage");
+const closeNews=document.getElementById("closeNews");
 
-const ui = {
-    cookies: document.getElementById("cookies"),
-    clickPower: document.getElementById("clickPower"),
-    multiplier: document.getElementById("multiplier"),
-    auto: document.getElementById("auto")
-};
+const ui={cookies:document.getElementById("cookies"), clickPower:document.getElementById("clickPower"), multiplier:document.getElementById("multiplier"), auto:document.getElementById("auto")};
 
-function updateUI() {
-    ui.cookies.textContent = cookies;
-    ui.clickPower.textContent = clickPower;
-    ui.multiplier.textContent = multiplier;
-    ui.auto.textContent = autoCookies;
-    document.getElementById("buyClick").textContent = `Buy x2 Click (${prices.click})`;
-    document.getElementById("buyAuto").textContent = `Buy Auto Cookie +1/sec (${prices.auto})`;
-    document.getElementById("buyMult").textContent = `Buy x2 Multiplier (${prices.mult})`;
+function formatNumber(n){
+const units=[{value:1e3,symbol:"K"},{value:1e6,symbol:"M"},{value:1e9,symbol:"B"},{value:1e12,symbol:"T"},{value:1e15,symbol:"Qa"},{value:1e18,symbol:"Qi"},{value:1e21,symbol:"S"},{value:1e24,symbol:"Sp"},{value:1e27,symbol:"Oc"},{value:1e30,symbol:"No"}];
+for(let i=units.length-1;i>=0;i--){if(n>=units[i].value){return(n/units[i].value).toFixed(2).replace(/\.00$/,'')+units[i].symbol;}}
+return n.toString();
 }
 
-function save() {
-    localStorage.setItem("ctg_save", JSON.stringify({
-        cookies, clickPower, multiplier, autoCookies, prices
-    }));
+function updateUI(){
+ui.cookies.textContent=formatNumber(cookies);
+ui.clickPower.textContent=formatNumber(clickPower);
+ui.multiplier.textContent=formatNumber(multiplier);
+ui.auto.textContent=formatNumber(autoCookies);
+document.getElementById("buyClick").textContent=`Buy x2 Click (${prices.click})`;
+document.getElementById("buyAuto").textContent=`Buy Auto Cookie +1/sec (${prices.auto})`;
+document.getElementById("buyMult").textContent=`Buy x2 Multiplier (${prices.mult})`;
 }
 
-function load() {
-    const d = JSON.parse(localStorage.getItem("ctg_save"));
-    if (!d) return;
-    cookies = d.cookies;
-    clickPower = d.clickPower;
-    multiplier = d.multiplier;
-    autoCookies = d.autoCookies;
-    prices = d.prices;
+function save(){localStorage.setItem("ctg_save",JSON.stringify({cookies,clickPower,multiplier,autoCookies,prices,achievements}));}
+function load(){const d=JSON.parse(localStorage.getItem("ctg_save"));if(!d)return;cookies=d.cookies;clickPower=d.clickPower;multiplier=d.multiplier;autoCookies=d.autoCookies;prices=d.prices;achievements=d.achievements||{};}
+
+function createClickSpot(x,y){const s=document.createElement("div");s.className="clickSpot";s.style.left=x+"px";s.style.top=y+"px";document.body.appendChild(s);clickSfx.currentTime=0;clickSfx.play().catch(()=>{});setTimeout(()=>s.remove(),500);}
+function createFloatingText(x,y,value){if(value<=0)return;const f=document.createElement("div");f.className="floatingText";f.style.left=x+"px";f.style.top=y+"px";f.textContent="+"+value;document.body.appendChild(f);setTimeout(()=>f.remove(),1000);}
+function addAchievement(name){if(!achievements[name]){achievements[name]=true;alert("Achievement unlocked: "+name);save();}}
+
+function handleCookieClick(e){
+let value=clickPower*multiplier;cookies+=value;
+if(cookies>=1e6)addAchievement("Glitch (RARE)");
+createFloatingText(e.clientX,e.clientY,value);
+updateUI();save();
+if(!glitchMode && cookies>=1e30)startGlitchCutscene();
+if(glitchMode)teleportCookie();
 }
 
-function createClickSpot(x, y) {
-    const spot = document.createElement("div");
-    spot.className = "clickSpot";
-    spot.style.left = x + "px";
-    spot.style.top = y + "px";
-    document.body.appendChild(spot);
-    clickSfx.currentTime = 0;
-    clickSfx.play().catch(()=>{});
-    setTimeout(() => spot.remove(), 500);
+function teleportCookie(){
+const x=Math.random()*(window.innerWidth-100)+50;
+const y=Math.random()*(window.innerHeight-100)+50;
+cookie.style.left=x+"px";
+cookie.style.top=y+"px";
+cookie.style.position="absolute";
 }
 
-function createFloatingText(x, y, value) {
-    if(value <= 0) return;
-    const floatText = document.createElement("div");
-    floatText.className = "floatingText";
-    floatText.style.left = x + "px";
-    floatText.style.top = y + "px";
-    floatText.textContent = "+" + value;
-    document.body.appendChild(floatText);
-    setTimeout(() => floatText.remove(), 1000);
+function startGlitchCutscene(){
+glitchMode=true;
+document.body.innerHTML+="<div class='glitch'></div>";
+document.title="CTGAlpha 1.0 coming soon... ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN";
+alert("END IT ALL");
 }
 
-function handleCookieClick(e) {
-    const value = clickPower * multiplier;
-    cookies += value;
-    createFloatingText(e.clientX, e.clientY, value);
-    updateUI();
-    save();
-}
-
-overlay.onclick = () => {
-    overlay.remove();
-
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-
-    const orbContainer = document.createElement("div");
-    orbContainer.className = "spinGroup";
-    intro.appendChild(orbContainer);
-
-    const orbs = [];
-    for (let i = 0; i < 6; i++) {
-        const o = document.createElement("div");
-        o.className = "orb";
-        o.style.left = Math.random() * window.innerWidth + "px";
-        o.style.top = Math.random() * window.innerHeight + "px";
-        orbContainer.appendChild(o);
-        orbs.push(o);
-    }
-
-    setTimeout(() => {
-        orbs.forEach(o => {
-            o.style.left = centerX + "px";
-            o.style.top = centerY + "px";
-        });
-    }, 2000);
-
-    setTimeout(() => {
-        login.play();
-        introText.style.opacity = 1;
-        orbs.forEach(o => {
-            o.style.left = centerX + (Math.random() - 0.5) * 600 + "px";
-            o.style.top = centerY + (Math.random() - 0.5) * 400 + "px";
-            o.classList.add("explode");
-        });
-    }, 5000);
-
-    setTimeout(() => {
-        introText.style.opacity = 0;
-        intro.remove();
-        document.body.style.background = "linear-gradient(120deg, #1a1a1a, #0a0a0a, #111a33)";
-        bgm.volume = 0.6;
-        bgm.play().catch(()=>{});
-        newsPage.style.display = "flex";
-        load();
-        updateUI();
-        game.style.display = "flex";
-    }, 9000);
+overlay.onclick=()=>{
+overlay.remove();
+const centerX=window.innerWidth/2;
+const centerY=window.innerHeight/2;
+const orbContainer=document.createElement("div");orbContainer.className="spinGroup";intro.appendChild(orbContainer);
+const orbs=[];for(let i=0;i<6;i++){const o=document.createElement("div");o.className="orb";o.style.left=Math.random()*window.innerWidth+"px";o.style.top=Math.random()*window.innerHeight+"px";orbContainer.appendChild(o);orbs.push(o);}
+setTimeout(()=>{orbs.forEach(o=>{o.style.left=centerX+"px";o.style.top=centerY+"px";})},2000);
+setTimeout(()=>{login.play();introText.style.opacity=1;orbs.forEach(o=>{o.style.left=centerX+(Math.random()-0.5)*600+"px";o.style.top=centerY+(Math.random()-0.5)*400+"px";o.classList.add("explode");})},5000);
+setTimeout(()=>{introText.style.opacity=0;intro.remove();document.body.style.background="linear-gradient(120deg, #1a1a1a, #0a0a0a, #111a33)";bgm.volume=0.6;bgm.play().catch(()=>{});newsPage.style.display="flex";load();updateUI();game.style.display="flex";},9000);
 };
 
-cookie.onclick = (e) => {
-    handleCookieClick(e);
-    cookie.classList.add("bounce");
-    setTimeout(() => cookie.classList.remove("bounce"), 250);
-};
+cookie.onclick=(e)=>{handleCookieClick(e);cookie.classList.add("bounce");setTimeout(()=>cookie.classList.remove("bounce"),250);}
+document.getElementById("buyClick").onclick=(e)=>{if(cookies<prices.click)return;cookies-=prices.click;clickPower*=2;prices.click*=2;updateUI();save();}
+document.getElementById("buyAuto").onclick=(e)=>{if(cookies<prices.auto)return;cookies-=prices.auto;autoCookies++;prices.auto*=2;updateUI();save();}
+document.getElementById("buyMult").onclick=(e)=>{if(cookies<prices.mult)return;cookies-=prices.mult;multiplier*=2;prices.mult*=2;updateUI();save();}
+document.getElementById("mute").onclick=()=>{bgm.muted=!bgm.muted;}
+document.getElementById("reset").onclick=()=>{if(!confirm("Reset ALL progress?"))return;localStorage.removeItem("ctg_save");location.reload();}
+closeNews.onclick=()=>{newsPage.style.display="none";}
+document.body.addEventListener("click",(e)=>{createClickSpot(e.clientX,e.clientY);});
+setInterval(()=>{cookies+=autoCookies*multiplier;updateUI();save();if(glitchMode && cookies>=1e33){glitchMode=false;document.querySelector(".glitch").remove();document.title="CTGBeta 2.1";alert("Glitch Mode ended! You may continue playing.");}},1000);
 
-document.getElementById("buyClick").onclick = (e) => {
-    if(cookies < prices.click) return;
-    cookies -= prices.click;
-    clickPower *= 2;
-    prices.click *= 2;
-    updateUI();
-    save();
-};
-
-document.getElementById("buyAuto").onclick = (e) => {
-    if(cookies < prices.auto) return;
-    cookies -= prices.auto;
-    autoCookies++;
-    prices.auto *= 2;
-    updateUI();
-    save();
-};
-
-document.getElementById("buyMult").onclick = (e) => {
-    if(cookies < prices.mult) return;
-    cookies -= prices.mult;
-    multiplier *= 2;
-    prices.mult *= 2;
-    updateUI();
-    save();
-};
-
-document.getElementById("mute").onclick = () => {
-    bgm.muted = !bgm.muted;
-};
-
-document.getElementById("reset").onclick = () => {
-    if(!confirm("Reset ALL progress?")) return;
-    localStorage.removeItem("ctg_save");
-    location.reload();
-};
-
-closeNews.onclick = () => {
-    newsPage.style.display = "none";
-};
-
-document.body.addEventListener("click", (e) => {
-    createClickSpot(e.clientX, e.clientY);
-});
-
-setInterval(() => {
-    cookies += autoCookies * multiplier;
-    updateUI();
-    save();
-}, 1000);
 </script>
 </body>
 </html>
