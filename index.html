@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>CTGBeta 1.6</title>
+<title>CTGBeta 1.7</title>
 <style>
 * { box-sizing: border-box; }
 
@@ -76,6 +76,21 @@ body {
     transition: opacity 1.5s;
     z-index: 45;
     pointer-events: none;
+}
+
+#newsPage {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #111a33dd;
+    color: white;
+    z-index: 1002;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    font-size: 1.2em;
 }
 
 #game {
@@ -170,6 +185,17 @@ button {
 — canvayys
 </div>
 
+<div id="newsPage">
+<h2>CTGBeta News</h2>
+<p>Welcome back! Here's what's new:</p>
+<ul>
+<li>New click effects everywhere</li>
+<li>Multiplier price now doubles per purchase</li>
+<li>Mute background music button added</li>
+</ul>
+<button id="closeNews">Close</button>
+</div>
+
 <div id="game">
     <div id="cookie">🍪</div>
     <div id="stats">
@@ -182,6 +208,7 @@ button {
         <button id="buyClick">Buy x2 Click (50)</button>
         <button id="buyAuto">Buy Auto Cookie +1/sec (200)</button>
         <button id="buyMult">Buy x2 Multiplier (500)</button>
+        <button id="mute">Mute/Unmute Music</button>
         <button id="reset">Reset Progress</button>
     </div>
 </div>
@@ -195,7 +222,6 @@ let cookies = 0;
 let clickPower = 1;
 let multiplier = 1;
 let autoCookies = 0;
-let lastClick = 0;
 let prices = { click: 50, auto: 200, mult: 500 };
 
 const overlay = document.getElementById("overlay");
@@ -206,6 +232,8 @@ const cookie = document.getElementById("cookie");
 const bgm = document.getElementById("bgm");
 const login = document.getElementById("login");
 const clickSfx = document.getElementById("clickSfx");
+const newsPage = document.getElementById("newsPage");
+const closeNews = document.getElementById("closeNews");
 
 const ui = {
     cookies: document.getElementById("cookies"),
@@ -219,6 +247,9 @@ function updateUI() {
     ui.clickPower.textContent = clickPower;
     ui.multiplier.textContent = multiplier;
     ui.auto.textContent = autoCookies;
+    document.getElementById("buyClick").textContent = `Buy x2 Click (${prices.click})`;
+    document.getElementById("buyAuto").textContent = `Buy Auto Cookie +1/sec (${prices.auto})`;
+    document.getElementById("buyMult").textContent = `Buy x2 Multiplier (${prices.mult})`;
 }
 
 function save() {
@@ -262,8 +293,6 @@ function createFloatingText(x, y, value) {
 function handleCookieClick(e) {
     const value = clickPower * multiplier;
     cookies += value;
-    clickSfx.currentTime = 0;
-    clickSfx.play().catch(()=>{});
     createFloatingText(e.clientX, e.clientY, value);
     updateUI();
     save();
@@ -312,6 +341,7 @@ overlay.onclick = () => {
         document.body.style.background = "linear-gradient(120deg, #1a1a1a, #0a0a0a, #111a33)";
         bgm.volume = 0.6;
         bgm.play().catch(()=>{});
+        newsPage.style.display = "flex";
         load();
         updateUI();
         game.style.display = "flex";
@@ -325,40 +355,47 @@ cookie.onclick = (e) => {
 };
 
 document.getElementById("buyClick").onclick = (e) => {
-    if (cookies < prices.click) return;
+    if(cookies < prices.click) return;
     cookies -= prices.click;
     clickPower *= 2;
     prices.click *= 2;
-    clickSfx.currentTime = 0;
-    clickSfx.play().catch(()=>{});
+    updateUI();
+    save();
 };
 
 document.getElementById("buyAuto").onclick = (e) => {
-    if (cookies < prices.auto) return;
+    if(cookies < prices.auto) return;
     cookies -= prices.auto;
     autoCookies++;
     prices.auto *= 2;
-    clickSfx.currentTime = 0;
-    clickSfx.play().catch(()=>{});
+    updateUI();
+    save();
 };
 
 document.getElementById("buyMult").onclick = (e) => {
-    if (cookies < prices.mult) return;
+    if(cookies < prices.mult) return;
     cookies -= prices.mult;
     multiplier *= 2;
     prices.mult *= 2;
-    clickSfx.currentTime = 0;
-    clickSfx.play().catch(()=>{});
+    updateUI();
+    save();
+};
+
+document.getElementById("mute").onclick = () => {
+    bgm.muted = !bgm.muted;
 };
 
 document.getElementById("reset").onclick = () => {
-    if (!confirm("Reset ALL progress?")) return;
+    if(!confirm("Reset ALL progress?")) return;
     localStorage.removeItem("ctg_save");
     location.reload();
 };
 
+closeNews.onclick = () => {
+    newsPage.style.display = "none";
+};
+
 document.body.addEventListener("click", (e) => {
-    if(e.target === cookie || e.target.tagName === "BUTTON") return;
     createClickSpot(e.clientX, e.clientY);
 });
 
