@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>CTGBeta 2.3</title>
+<title>CTGBeta 2.4</title>
 <style>
 *{box-sizing:border-box;}
 body{margin:0;height:100vh;background:black;overflow:hidden;font-family:Arial,sans-serif;color:white;display:flex;justify-content:center;align-items:center;user-select:none;position:relative;transition:background 2s ease;}
@@ -71,7 +71,7 @@ Auto/sec: <span id="auto">0</span>
 <audio id="bgm" src="backgroundmusic.mp3" loop></audio>
 <audio id="login" src="login.mp3"></audio>
 <audio id="clickSfx" src="click.mp3"></audio>
-<audio id="glitching" src="glitching.mp3"></audio>
+<audio id="glitching" src="glitching.mp3" loop></audio>
 <audio id="enditall" src="enditall.mp3" loop></audio>
 
 <script>
@@ -95,20 +95,14 @@ function formatNumber(n){const u=[{v:1e3,s:"K"},{v:1e6,s:"M"},{v:1e9,s:"B"},{v:1
 function updateUI(){ui.cookies.textContent=formatNumber(cookies);ui.clickPower.textContent=formatNumber(clickPower);ui.multiplier.textContent=formatNumber(multiplier);ui.auto.textContent=formatNumber(autoCookies);document.getElementById("buyClick").textContent=`Buy x2 Click (${prices.click})`;document.getElementById("buyAuto").textContent=`Buy Auto Cookie +1/sec (${prices.auto})`;document.getElementById("buyMult").textContent=`Buy x2 Multiplier (${prices.mult})`;}
 function save(){localStorage.setItem("ctg_save",JSON.stringify({cookies,clickPower,multiplier,autoCookies,prices,achievements,glitchMode}));}
 function load(){const d=JSON.parse(localStorage.getItem("ctg_save"));if(!d)return;cookies=d.cookies;clickPower=d.clickPower;multiplier=d.multiplier;autoCookies=d.autoCookies;prices=d.prices;achievements=d.achievements||{};glitchMode=d.glitchMode||false;if(glitchMode)resumeGlitch();}
-
 function createClickSpot(x,y){const s=document.createElement("div");s.className="clickSpot";s.style.left=x+"px";s.style.top=y+"px";document.body.appendChild(s);clickSfx.currentTime=0;clickSfx.play().catch(()=>{});setTimeout(()=>s.remove(),500);}
 function createFloatingText(x,y,v){if(v<=0)return;const f=document.createElement("div");f.className="floatingText";f.style.left=x+"px";f.style.top=y+"px";f.textContent="+"+v;document.body.appendChild(f);setTimeout(()=>f.remove(),1000);}
 function addAchievement(n){if(!achievements[n]){achievements[n]=true;alert("Achievement unlocked: "+n);save();}}
-
 function handleCookieClick(e){let v=clickPower*multiplier;cookies+=v;createFloatingText(e.clientX,e.clientY,v);if(cookies>=1e6)addAchievement("Glitch (RARE)");if(cookies>=1e9)addAchievement("Mega Cookie");if(cookies>=1e12)addAchievement("Trillionaire");if(cookies>=1e15)addAchievement("Quadrillionaire");if(cookies>=1e18)addAchievement("Quintillionaire");if(cookies>=1e21)addAchievement("Septillionaire");if(cookies>=1e30&&!glitchMode)startGlitchCutscene();if(glitchMode)teleportCookie();updateUI();save();}
-
 function teleportCookie(){const x=Math.random()*(window.innerWidth-100)+50;const y=Math.random()*(window.innerHeight-100)+50;cookie.style.left=x+"px";cookie.style.top=y+"px";cookie.style.position="absolute";}
-
-function startGlitchCutscene(){glitchMode=true;save();document.body.innerHTML+="<div class='glitch'></div>";document.title="CTGAlpha 1.0 coming soon... ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN";glitching.play();let f=0;const fi=setInterval(()=>{document.body.style.background=f%2==0?"#ff0000":"#000";f++;if(f>=10){clearInterval(fi);glitching.pause();enditall.play();}},500);alert("Glitch Mode activated! Cannot stop until 10000No (1e33 cookies).");}
-
-function resumeGlitch(){document.body.innerHTML+="<div class='glitch'></div>";document.title="CTGAlpha 1.0 coming soon... ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN";enditall.play();}
-
-function endGlitch(){enditall.pause();enditall.currentTime=0;document.querySelector(".glitch")?.remove();glitchMode=false;document.title="CTGBeta 2.3";save();alert("Glitch ended! You may continue playing.");}
+function startGlitchCutscene(){glitchMode=true;save();document.body.innerHTML+="<div class='glitch'></div>";document.title="CTGAlpha 1.0 coming soon... ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN";glitching.currentTime=0;glitching.play();let f=0;const fi=setInterval(()=>{document.body.style.background=f%2==0?"#ff0000":"#000";f++;if(f>=10){clearInterval(fi);glitching.pause();enditall.currentTime=0;enditall.play();}},500);alert("Glitch Mode activated! Cannot stop until 10000No (1e33 cookies).");}
+function resumeGlitch(){document.body.innerHTML+="<div class='glitch'></div>";document.title="CTGAlpha 1.0 coming soon... ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN";enditall.currentTime=0;enditall.play();}
+function endGlitch(){enditall.pause();enditall.currentTime=0;document.querySelector(".glitch")?.remove();glitchMode=false;document.title="CTGBeta 2.4";save();alert("Glitch ended! You may continue playing.");}
 
 overlay.onclick=()=>{
 overlay.remove();
