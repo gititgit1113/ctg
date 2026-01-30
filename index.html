@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>CTGBeta 1.2</title>
+<title>CTGBeta 1.3</title>
 <style>
 * { box-sizing: border-box; }
 
@@ -17,6 +17,7 @@ body {
     justify-content: center;
     align-items: center;
     user-select: none;
+    position: relative;
 }
 
 #overlay {
@@ -88,6 +89,7 @@ body {
     font-size: 9em;
     cursor: pointer;
     animation: cookieSpin 6s linear infinite;
+    position: relative;
 }
 
 #cookie.bounce {
@@ -120,6 +122,38 @@ button {
     padding: 10px 18px;
     font-size: 1em;
     cursor: pointer;
+    position: relative;
+}
+
+.clickSpot {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    animation: fadeSpot 0.5s forwards;
+}
+
+@keyframes fadeSpot {
+    0% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
+}
+
+.floatingText {
+    position: absolute;
+    color: #fff;
+    font-weight: bold;
+    pointer-events: none;
+    animation: floatUp 1s forwards;
+    font-size: 1.2em;
+}
+
+@keyframes floatUp {
+    0% { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
+    100% { opacity: 0; transform: translate(-50%, -50%) translateY(-40px); }
 }
 </style>
 </head>
@@ -151,6 +185,7 @@ button {
 
 <audio id="bgm" src="backgroundmusic.mp3" loop></audio>
 <audio id="login" src="login.mp3"></audio>
+<audio id="clickSfx" src="click.mp3"></audio>
 
 <script>
 let cookies = 0;
@@ -167,6 +202,7 @@ const game = document.getElementById("game");
 const cookie = document.getElementById("cookie");
 const bgm = document.getElementById("bgm");
 const login = document.getElementById("login");
+const clickSfx = document.getElementById("clickSfx");
 
 const ui = {
     cookies: document.getElementById("cookies"),
@@ -198,7 +234,24 @@ function load() {
     prices = d.prices;
 }
 
-overlay.onclick = () => {
+function createClickEffect(x, y, value) {
+    const spot = document.createElement("div");
+    spot.className = "clickSpot";
+    spot.style.left = x + "px";
+    spot.style.top = y + "px";
+    document.body.appendChild(spot);
+    setTimeout(() => spot.remove(), 500);
+
+    const floatText = document.createElement("div");
+    floatText.className = "floatingText";
+    floatText.style.left = x + "px";
+    floatText.style.top = y + "px";
+    floatText.textContent = "+" + value;
+    document.body.appendChild(floatText);
+    setTimeout(() => floatText.remove(), 1000);
+}
+
+overlay.onclick = (e) => {
     overlay.remove();
 
     const centerX = window.innerWidth / 2;
@@ -246,44 +299,52 @@ overlay.onclick = () => {
     }, 9000);
 };
 
-cookie.onclick = () => {
+function handleClick(e, value) {
+    cookies += value;
+    clickSfx.currentTime = 0;
+    clickSfx.play().catch(()=>{});
+    createClickEffect(e.clientX, e.clientY, value);
+    updateUI();
+    save();
+}
+
+cookie.onclick = (e) => {
     const now = Date.now();
     if (now - lastClick < 400) return;
     lastClick = now;
-    cookies += clickPower * multiplier;
+    handleClick(e, clickPower * multiplier);
     cookie.classList.add("bounce");
     setTimeout(() => cookie.classList.remove("bounce"), 250);
-    updateUI();
-    save();
 };
 
-document.getElementById("buyClick").onclick = () => {
+document.getElementById("buyClick").onclick = (e) => {
     if (cookies < prices.click) return;
     cookies -= prices.click;
     clickPower *= 2;
     prices.click *= 2;
-    updateUI(); save();
+    handleClick(e, 0);
 };
 
-document.getElementById("buyAuto").onclick = () => {
+document.getElementById("buyAuto").onclick = (e) => {
     if (cookies < prices.auto) return;
     cookies -= prices.auto;
     autoCookies++;
     prices.auto *= 2;
-    updateUI(); save();
+    handleClick(e, 0);
 };
 
-document.getElementById("buyMult").onclick = () => {
+document.getElementById("buyMult").onclick = (e) => {
     if (cookies < prices.mult) return;
     cookies -= prices.mult;
     multiplier *= 2;
     prices.mult *= 2;
-    updateUI(); save();
+    handleClick(e, 0);
 };
 
-document.getElementById("reset").onclick = () => {
+document.getElementById("reset").onclick = (e) => {
     if (!confirm("Reset ALL progress?")) return;
     localStorage.removeItem("ctg_save");
+    handleClick(e, 0);
     location.reload();
 };
 
