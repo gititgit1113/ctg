@@ -1,3 +1,228 @@
 <!DOCTYPE html>
-<title>CTGbeta 1.1</title>
-<h1>work in progress</h1>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CTGBeta 1.1</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    color: white;
+    background: linear-gradient(135deg, #0ff, #ff00ff, #ffcc00, #00ff88);
+    background-size: 400% 400%;
+    animation: bgmove 18s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+}
+
+@keyframes bgmove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* INTRO */
+
+#overlay {
+    position: fixed;
+    inset: 0;
+    background: black;
+    z-index: 20;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+#overlayText {
+    font-size: 1.5em;
+    opacity: 1;
+}
+
+#intro {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 15;
+}
+
+.orb {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(0, 150, 255, 0.6);
+    filter: blur(30px);
+    animation: float 2s ease-in-out infinite alternate;
+}
+
+@keyframes float {
+    from { transform: translateY(-20px); }
+    to { transform: translateY(20px); }
+}
+
+.merge {
+    animation: merge 3s ease-in-out forwards;
+}
+
+@keyframes merge {
+    to {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) rotate(720deg);
+    }
+}
+
+.splatter {
+    animation: splatter 3s ease-out forwards;
+    background: rgba(0, 255, 150, 0.6);
+}
+
+@keyframes splatter {
+    to {
+        transform: translate(var(--x), var(--y)) scale(0.2);
+        opacity: 0;
+    }
+}
+
+#introText {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.4em;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 1s;
+    z-index: 18;
+}
+
+/* GAME */
+
+#game {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+#cookie {
+    font-size: 9em;
+    cursor: pointer;
+    animation: spin 6s linear infinite;
+}
+
+#cookie.bounce {
+    animation: spin 6s linear infinite, bounce 0.25s ease;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.35); }
+    100% { transform: scale(1); }
+}
+
+#stats {
+    text-align: center;
+}
+
+#buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+button {
+    padding: 10px 18px;
+    font-size: 1em;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div id="overlay">
+    <div id="overlayText">Interact to enable sounds (required)</div>
+</div>
+
+<div id="intro"></div>
+
+<div id="introText">
+    Мы вернулись. Спасибо за терпение.<br>
+    — canvayys
+</div>
+
+<div id="game">
+    <div id="cookie">🍪</div>
+    <div id="stats">
+        Cookies: <span id="cookies">0</span>
+    </div>
+    <div id="buttons">
+        <button>More coming soon…</button>
+    </div>
+</div>
+
+<audio id="bgm" src="backgroundmusic.mp3" loop></audio>
+<audio id="login" src="login.mp3"></audio>
+
+<script>
+const overlay = document.getElementById("overlay");
+const intro = document.getElementById("intro");
+const introText = document.getElementById("introText");
+const game = document.getElementById("game");
+const bgm = document.getElementById("bgm");
+const login = document.getElementById("login");
+
+overlay.onclick = () => {
+    overlay.remove();
+
+    const orbs = [];
+    for (let i = 0; i < 6; i++) {
+        const orb = document.createElement("div");
+        orb.className = "orb";
+        orb.style.left = Math.random() * 100 + "%";
+        orb.style.top = Math.random() * 100 + "%";
+        intro.appendChild(orb);
+        orbs.push(orb);
+    }
+
+    setTimeout(() => {
+        orbs.forEach(o => o.classList.add("merge"));
+    }, 2000);
+
+    setTimeout(() => {
+        login.play();
+        introText.style.opacity = 1;
+
+        orbs.forEach(o => {
+            o.style.setProperty("--x", `${(Math.random() - 0.5) * 800}px`);
+            o.style.setProperty("--y", `${(Math.random() - 0.5) * 600}px`);
+            o.classList.add("splatter");
+        });
+    }, 5000);
+
+    setTimeout(() => {
+        introText.style.opacity = 0;
+        intro.remove();
+        game.style.display = "flex";
+        bgm.play();
+    }, 9000);
+};
+</script>
+
+</body>
+</html>
