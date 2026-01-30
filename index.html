@@ -21,11 +21,12 @@ body{margin:0;height:100vh;background:black;overflow:hidden;font-family:Arial,sa
 @keyframes bounce{0%{transform:scale(1);}50%{transform:scale(1.35);}100%{transform:scale(1);}}
 #stats{text-align:center;font-size:1.2em;}
 #buttons{display:flex;flex-direction:column;gap:8px;}
-button{padding:10px 18px;font-size:1em;cursor:pointer;position:relative;}
+button{padding:10px 18px;font-size:1em;cursor:pointer;position:relative;transition:transform 0.1s;}
+button:active{transform:scale(0.95);}
 .clickSpot{position:fixed;width:50px;height:50px;background:white;border-radius:50%;opacity:0.8;pointer-events:none;transform:translate(-50%,-50%);animation:fadeSpot 0.5s forwards;z-index:1000;}
 @keyframes fadeSpot{0%{opacity:0.8;transform:translate(-50%,-50%) scale(1);}100%{opacity:0;transform:translate(-50%,-50%) scale(2);}}
-.floatingText{position:fixed;color:#fff;font-weight:bold;pointer-events:none;animation:floatUp 1s forwards;font-size:1.2em;z-index:1001;}
-@keyframes floatUp{0%{opacity:1;transform:translate(-50%,-50%) translateY(0);}100%{opacity:0;transform:translate(-50%,-50%) translateY(-40px);}}
+.floatingText{position:fixed;color:#fff;font-weight:bold;pointer-events:none;animation:floatUp 1s forwards;font-size:1.2em;z-index:1001;text-shadow:0 0 4px #00cfff;}
+@keyframes floatUp{0%{opacity:1;transform:translate(-50%,-50%) translateY(0);}100%{opacity:0;transform:translate(-50%,-50%) translateY(-50px);}}
 #achievementsPanel{display:none;position:fixed;top:10px;right:10px;background:#111a33cc;color:white;padding:10px;z-index:2000;max-height:90%;overflow:auto;}
 #endMessage{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;text-align:center;font-size:2em;color:white;background:black;opacity:0;z-index:99999;pointer-events:none;transition:opacity 3s;}
 </style>
@@ -36,12 +37,12 @@ button{padding:10px 18px;font-size:1em;cursor:pointer;position:relative;}
 <div id="introText">We are back. Thank you for your patience.<br>— canvayys</div>
 
 <div id="newsPage">
-<h2>CTGBeta News</h2>
+<h2>CTGPre News</h2>
 <p>Welcome back! Here's what's new:</p>
 <ul>
-<li>Click effects everywhere</li>
-<li>Multiplier price doubles per purchase</li>
-<li>Achievements added</li>
+<li>We are now out of Beta./li>
+<li>It means the game is getting ready to release.</li>
+<li>Keep in mind that some stuff might be still buggy.</li>
 </ul>
 <button id="closeNews">Close</button>
 </div>
@@ -87,7 +88,7 @@ const endMessage=document.getElementById("endMessage");
 const ui={cookies:document.getElementById("cookies"),clickPower:document.getElementById("clickPower"),multiplier:document.getElementById("multiplier"),auto:document.getElementById("auto")};
 
 function formatNumber(n){const u=[{v:1e3,s:"K"},{v:1e6,s:"M"},{v:1e9,s:"B"},{v:1e12,s:"T"},{v:1e15,s:"Qa"},{v:1e18,s:"Qi"},{v:1e21,s:"S"},{v:1e24,s:"Sp"},{v:1e27,s:"Oc"},{v:1e30,s:"No"}];for(let i=u.length-1;i>=0;i--){if(n>=u[i].v){return(n/u[i].v).toFixed(2).replace(/\.00$/,'')+u[i].s;}}return n.toString();}
-function updateUI(){ui.cookies.textContent=formatNumber(cookies);ui.clickPower.textContent=formatNumber(clickPower);ui.multiplier.textContent=formatNumber(multiplier);ui.auto.textContent=formatNumber(autoCookies);document.getElementById("buyClick").textContent=`Buy x2 Click (${prices.click})`;document.getElementById("buyAuto").textContent=`Buy Auto Cookie +1/sec (${prices.auto})`;document.getElementById("buyMult").textContent=`Buy x2 Multiplier (${prices.mult})`;}
+function updateUI(){ui.cookies.textContent=formatNumber(cookies);ui.clickPower.textContent=formatNumber(clickPower);ui.multiplier.textContent=formatNumber(multiplier);ui.auto.textContent=formatNumber(autoCookies);document.getElementById("buyClick").textContent=`Buy x2 Click (${formatNumber(prices.click)})`;document.getElementById("buyAuto").textContent=`Buy Auto Cookie +1/sec (${formatNumber(prices.auto)})`;document.getElementById("buyMult").textContent=`Buy x2 Multiplier (${formatNumber(prices.mult)})`;}
 function save(){localStorage.setItem("ctg_save",JSON.stringify({cookies,clickPower,multiplier,autoCookies,prices,achievements}));}
 function load(){const d=JSON.parse(localStorage.getItem("ctg_save"));if(!d)return;cookies=d.cookies||0;clickPower=d.clickPower||1;multiplier=d.multiplier||1;autoCookies=d.autoCookies||0;prices=d.prices||{click:50,auto:200,mult:500};achievements=d.achievements||{};updateUI();}
 function createClickSpot(x,y){const s=document.createElement("div");s.className="clickSpot";s.style.left=x+"px";s.style.top=y+"px";document.body.appendChild(s);clickSfx.currentTime=0;clickSfx.play().catch(()=>{});setTimeout(()=>s.remove(),500);}
