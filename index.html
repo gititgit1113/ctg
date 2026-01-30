@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>CTGBeta 2.5</title>
+<title>CTGBeta 2.6</title>
 <style>
 *{box-sizing:border-box;}
 body{margin:0;height:100vh;background:black;overflow:hidden;font-family:Arial,sans-serif;color:white;display:flex;justify-content:center;align-items:center;user-select:none;position:relative;transition:background 2s ease;}
@@ -29,6 +29,7 @@ button{padding:10px 18px;font-size:1em;cursor:pointer;position:relative;}
 .glitch{position:absolute;top:0;left:0;width:100%;height:100%;background:black;color:#0ff;font-family:monospace;overflow:hidden;pointer-events:none;z-index:9999;mix-blend-mode:difference;animation:glitchAnim 0.3s infinite;}
 @keyframes glitchAnim{0%{transform:translate(0,0);}25%{transform:translate(5px,-5px);}50%{transform:translate(-5px,5px);}75%{transform:translate(5px,5px);}100%{transform:translate(0,0);}}
 #achievementsPanel{display:none;position:fixed;top:10px;right:10px;background:#111a33cc;color:white;padding:10px;z-index:2000;max-height:90%;overflow:auto;}
+#endMessage{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;text-align:center;font-size:2em;color:white;background:black;opacity:0;z-index:99999;pointer-events:none;transition:opacity 3s;}
 </style>
 </head>
 <body>
@@ -67,6 +68,7 @@ Auto/sec: <span id="auto">0</span>
 </div>
 
 <div id="achievementsPanel"></div>
+<div id="endMessage">Thanks for playing C00K13 CL1CK3R -canvayys</div>
 
 <audio id="bgm" src="backgroundmusic.mp3" loop></audio>
 <audio id="login" src="login.mp3"></audio>
@@ -89,31 +91,22 @@ const enditall=document.getElementById("enditall");
 const newsPage=document.getElementById("newsPage");
 const closeNews=document.getElementById("closeNews");
 const achPanel=document.getElementById("achievementsPanel");
+const endMessage=document.getElementById("endMessage");
 const ui={cookies:document.getElementById("cookies"),clickPower:document.getElementById("clickPower"),multiplier:document.getElementById("multiplier"),auto:document.getElementById("auto")};
 
 function formatNumber(n){const u=[{v:1e3,s:"K"},{v:1e6,s:"M"},{v:1e9,s:"B"},{v:1e12,s:"T"},{v:1e15,s:"Qa"},{v:1e18,s:"Qi"},{v:1e21,s:"S"},{v:1e24,s:"Sp"},{v:1e27,s:"Oc"},{v:1e30,s:"No"}];for(let i=u.length-1;i>=0;i--){if(n>=u[i].v){return(n/u[i].v).toFixed(2).replace(/\.00$/,'')+u[i].s;}}return n.toString();}
 function updateUI(){ui.cookies.textContent=formatNumber(cookies);ui.clickPower.textContent=formatNumber(clickPower);ui.multiplier.textContent=formatNumber(multiplier);ui.auto.textContent=formatNumber(autoCookies);document.getElementById("buyClick").textContent=`Buy x2 Click (${prices.click})`;document.getElementById("buyAuto").textContent=`Buy Auto Cookie +1/sec (${prices.auto})`;document.getElementById("buyMult").textContent=`Buy x2 Multiplier (${prices.mult})`;}
 function save(){localStorage.setItem("ctg_save",JSON.stringify({cookies,clickPower,multiplier,autoCookies,prices,achievements,glitchMode}));}
-function load(){const d=JSON.parse(localStorage.getItem("ctg_save"));if(!d)return;cookies=d.cookies;clickPower=d.clickPower;multiplier=d.multiplier;autoCookies=d.autoCookies;prices=d.prices;achievements=d.achievements||{};glitchMode=d.glitchMode||false;if(glitchMode)resumeGlitch();}
+function load(){const d=JSON.parse(localStorage.getItem("ctg_save"));if(!d)return;cookies=d.cookies||0;clickPower=d.clickPower||1;multiplier=d.multiplier||1;autoCookies=d.autoCookies||0;prices=d.prices||{click:50,auto:200,mult:500};achievements=d.achievements||{};glitchMode=d.glitchMode||false;updateUI();if(glitchMode)resumeGlitch();}
 function createClickSpot(x,y){const s=document.createElement("div");s.className="clickSpot";s.style.left=x+"px";s.style.top=y+"px";document.body.appendChild(s);clickSfx.currentTime=0;clickSfx.play().catch(()=>{});setTimeout(()=>s.remove(),500);}
 function createFloatingText(x,y,v){if(v<=0)return;const f=document.createElement("div");f.className="floatingText";f.style.left=x+"px";f.style.top=y+"px";f.textContent="+"+v;document.body.appendChild(f);setTimeout(()=>f.remove(),1000);}
 function addAchievement(n){if(!achievements[n]){achievements[n]=true;alert("Achievement unlocked: "+n);save();}}
-function handleCookieClick(e){let v=clickPower*multiplier;cookies+=v;createFloatingText(e.clientX,e.clientY,v);if(cookies>=1e6)addAchievement("Glitch (RARE)");if(cookies>=1e9)addAchievement("Mega Cookie");if(cookies>=1e12)addAchievement("Trillionaire");if(cookies>=1e15)addAchievement("Quadrillionaire");if(cookies>=1e18)addAchievement("Quintillionaire");if(cookies>=1e21)addAchievement("Septillionaire");if(cookies>=1e30&&!glitchMode)startGlitchCutscene();if(glitchMode)teleportCookie();updateUI();save();}
+function handleCookieClick(e){let v=clickPower*multiplier;cookies+=v;createFloatingText(e.clientX,e.clientY,v);if(cookies>=1e6)addAchievement("Glitch (RARE)");if(cookies>=1e9)addAchievement("Mega Cookie");if(cookies>=1e12)addAchievement("Trillionaire");if(cookies>=1e15)addAchievement("Quadrillionaire");if(cookies>=1e18)addAchievement("Quintillionaire");if(cookies>=1e21)addAchievement("Septillionaire");updateUI();save();checkEnd();}
+function checkEnd(){if(cookies>=1e33){bgm.pause();glitching.pause();enditall.pause();document.body.style.background="black";endMessage.style.opacity=1;setTimeout(()=>{localStorage.removeItem("ctg_save");location.reload();},5000);}}
 function teleportCookie(){const x=Math.random()*(window.innerWidth-100)+50;const y=Math.random()*(window.innerHeight-100)+50;cookie.style.left=x+"px";cookie.style.top=y+"px";cookie.style.position="absolute";}
-function startGlitchCutscene(){
-    glitchMode=true; save();
-    let g=document.createElement("div");
-    g.className="glitch"; g.style.pointerEvents="none"; document.body.appendChild(g);
-    document.title="CTGAlpha 1.0 coming soon... ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN";
-    glitching.currentTime=0; glitching.loop=true; glitching.play().catch(()=>{});
-    let flashCount=0; const flashInterval=setInterval(()=>{
-        document.body.style.background=flashCount%2===0?"#ff0000":"#000000"; flashCount++;
-        if(flashCount>=10){ clearInterval(flashInterval); glitching.pause(); enditall.currentTime=0; enditall.play().catch(()=>{}); document.body.style.background="linear-gradient(120deg,#1a1a1a,#0a0a0a,#111a33)";}
-    },500);
-    alert("Glitch Mode activated! Cannot stop until 10000No (1e33 cookies).");
-}
+function startGlitchCutscene(){glitchMode=true;save();let g=document.createElement("div");g.className="glitch";g.style.pointerEvents="none";document.body.appendChild(g);document.title="CTGAlpha 1.0 coming soon... ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN";glitching.currentTime=0;glitching.loop=true;glitching.play().catch(()=>{});let flashCount=0;const flashInterval=setInterval(()=>{document.body.style.background=flashCount%2===0?"#ff0000":"#000000";flashCount++;if(flashCount>=10){clearInterval(flashInterval);glitching.pause();enditall.currentTime=0;enditall.play().catch(()=>{});document.body.style.background="linear-gradient(120deg,#1a1a1a,#0a0a0a,#111a33)";}},500);alert("Glitch Mode activated!");}
 function resumeGlitch(){document.body.innerHTML+="<div class='glitch'></div>";document.title="CTGAlpha 1.0 coming soon... ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN ITS ALL BROKEN";enditall.currentTime=0;enditall.play();}
-function endGlitch(){enditall.pause();enditall.currentTime=0;document.querySelector(".glitch")?.remove();glitchMode=false;document.title="CTGBeta 2.5";save();alert("Glitch ended! You may continue playing.");}
+function endGlitch(){enditall.pause();enditall.currentTime=0;document.querySelector(".glitch")?.remove();glitchMode=false;document.title="CTGBeta 2.6";save();}
 
 overlay.onclick=()=>{
 overlay.remove();
@@ -134,9 +127,7 @@ document.getElementById("achievementsBtn").onclick=()=>{achPanel.style.display=a
 document.getElementById("reset").onclick=()=>{if(!confirm("Reset ALL progress?"))return;localStorage.removeItem("ctg_save");location.reload();}
 closeNews.onclick=()=>{newsPage.style.display="none";}
 document.body.addEventListener("click",(e)=>{createClickSpot(e.clientX,e.clientY);});
-setInterval(()=>{
-if(!glitchMode){cookies+=autoCookies*multiplier;updateUI();save();}
-else if(cookies>=1e33){const c=confirm("Glitch reached 1e33! Reset or Continue?\nOK=Continue, Cancel=Reset");if(c)endGlitch();else location.reload();}},1000);
+setInterval(()=>{if(!glitchMode){cookies+=autoCookies*multiplier;updateUI();save();}else if(cookies>=1e33){checkEnd();}},1000);
 </script>
 </body>
 </html>
